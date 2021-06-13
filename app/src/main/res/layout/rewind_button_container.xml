@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/rewind"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_rewind" />
+
+    <ImageView
+        android:id="@+id/rewind_disabled"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_rewind_disabled"
+        android:visibility="gone" />
+
+</FrameLayout>

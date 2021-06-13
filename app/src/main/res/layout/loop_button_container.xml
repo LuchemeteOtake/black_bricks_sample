@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/loop"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_loop" />
+
+    <ImageView
+        android:id="@+id/loop_active"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_loop_active"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/loop_disabled"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_loop_disabled"
+        android:visibility="gone"/>
+
+</FrameLayout>

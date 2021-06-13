@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/play"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_play" />
+
+    <ImageView
+        android:id="@+id/pause"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_pause"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/play_disabled"
+        style="@style/RecorderButton"
+        android:src="@drawable/ic_play_disabled"
+        android:visibility="gone" />
+</FrameLayout>
