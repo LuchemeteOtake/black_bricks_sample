@@ -1,6 +1,7 @@
 package ru.luchemete.simplerecorder.audio.impl
 
 import android.media.*
+import org.jtransforms.fft.FloatFFT_1D
 import ru.luchemete.simplerecorder.MainApp
 import ru.luchemete.simplerecorder.audio.PlayBackSettings
 import ru.luchemete.simplerecorder.audio.PlaybackListener
@@ -79,6 +80,28 @@ class PlayerImpl : Player {
 
         processedAudioData = processedAudioData.map {
             it.map { value -> butterworth.filter(value.toDouble()).toFloat() }.toFloatArray()
+
+//            val audioBuffer = it.map { value -> value }.toFloatArray()
+//            val FFT_SIZE = audioBuffer.size / 2
+//            val mFFT = FloatFFT_1D(FFT_SIZE.toLong())
+//
+//            mFFT.realForward(audioBuffer)
+//
+//            for (fftBin in 0 until FFT_SIZE) {
+//                val frequency = fftBin.toFloat() * 44100f / FFT_SIZE.toFloat()
+//
+//                if (frequency > settings.lpfValue) {
+//                    val real = 2 * fftBin
+//                    val imaginary = 2 * fftBin + 1
+//
+//                    audioBuffer[real] = 0f
+//                    audioBuffer[imaginary] = 0f
+//                }
+//            }
+//
+//            mFFT.realInverse(audioBuffer, false)
+//
+//            audioBuffer
         }
     }
 

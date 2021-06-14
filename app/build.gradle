@@ -44,6 +44,8 @@ dependencies {
     // iirj
     implementation 'uk.me.berndporr:iirj:1.3'
 
+    // JTransforms
+    implementation 'com.github.wendykierp:JTransforms:3.1'
 
     // Jetpack
     implementation 'androidx.core:core-ktx:1.5.0'
