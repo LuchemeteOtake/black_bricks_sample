@@ -1,7 +1,6 @@
 package ru.luchemete.simplerecorder.audio.impl
 
 import android.media.*
-import android.util.Log
 import ru.luchemete.simplerecorder.MainApp
 import ru.luchemete.simplerecorder.audio.PlayBackSettings
 import ru.luchemete.simplerecorder.audio.PlaybackListener
@@ -18,8 +17,8 @@ class PlayerImpl : Player {
 
     private var playbackListener: PlaybackListener? = null
 
-    private var audioData = LinkedList<ShortArray>()
-    private lateinit var processedAudioData: List<ShortArray>
+    private var audioData = LinkedList<FloatArray>()
+    private lateinit var processedAudioData: List<FloatArray>
 
     private var cursorPosition = 0
 
@@ -34,20 +33,20 @@ class PlayerImpl : Player {
         .build()
 
     private var audioFormat = AudioFormat.Builder()
-        .setEncoding(AudioFormat.ENCODING_PCM_16BIT)
+        .setEncoding(MainApp.ENCODING)
         .setSampleRate(MainApp.SAMPLE_RATE)
         .build()
 
     private var bufferSize = AudioTrack.getMinBufferSize(
         MainApp.SAMPLE_RATE, AudioFormat.CHANNEL_OUT_MONO,
-        AudioFormat.ENCODING_PCM_16BIT
+        MainApp.ENCODING
     )
 
     override fun setSettings(settings: PlayBackSettings) {
         this.settings = settings
     }
 
-    override fun setAudioData(audioData: LinkedList<ShortArray>) {
+    override fun setAudioData(audioData: LinkedList<FloatArray>) {
         this.audioData = audioData
     }
 
@@ -68,7 +67,7 @@ class PlayerImpl : Player {
         val scale = 10f.pow(settings.gainLevel / 20f)
 
         processedAudioData = processedAudioData.map {
-            it.map { value -> (value * scale).toInt().toShort() }.toShortArray()
+            it.map { value -> value * scale }.toFloatArray()
         }
     }
 
@@ -79,8 +78,7 @@ class PlayerImpl : Player {
         butterworth.lowPass(0, MainApp.SAMPLE_RATE.toDouble(), freq.toDouble())
 
         processedAudioData = processedAudioData.map {
-            it.map { value -> butterworth.filter(value.toDouble()).toInt().toShort() }
-                .toShortArray()
+            it.map { value -> butterworth.filter(value.toDouble()).toFloat() }.toFloatArray()
         }
     }
 
@@ -155,7 +153,7 @@ class PlayerImpl : Player {
                 numSamplesLeft
             }
 
-            audioTrack.write(data, 0, samplesToWrite)
+            audioTrack.write(data, 0, samplesToWrite, AudioTrack.WRITE_BLOCKING)
             cursorPosition++
             rewindIfNeeded()
         }

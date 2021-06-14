@@ -1,5 +1,5 @@
 package ru.luchemete.simplerecorder.audio
 
 interface AudioDataReceivedListener {
-    fun onAudioDataReceived(data: ShortArray)
+    fun onAudioDataReceived(data: FloatArray)
 }

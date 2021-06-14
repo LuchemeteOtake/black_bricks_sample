@@ -4,7 +4,6 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Process
-import android.util.Log
 import ru.luchemete.simplerecorder.MainApp
 import ru.luchemete.simplerecorder.audio.AudioDataReceivedListener
 import ru.luchemete.simplerecorder.audio.Recorder
@@ -20,7 +19,7 @@ class RecorderImpl : Recorder {
     private var bufferSize = AudioRecord.getMinBufferSize(
         MainApp.SAMPLE_RATE,
         AudioFormat.CHANNEL_IN_MONO,
-        AudioFormat.ENCODING_PCM_16BIT
+        MainApp.ENCODING
     )
 
     override fun setAudioDataReceivedListener(listener: AudioDataReceivedListener) {
@@ -49,7 +48,7 @@ class RecorderImpl : Recorder {
             MediaRecorder.AudioSource.DEFAULT,
             MainApp.SAMPLE_RATE,
             AudioFormat.CHANNEL_IN_MONO,
-            AudioFormat.ENCODING_PCM_16BIT,
+            MainApp.ENCODING,
             bufferSize
         )
 
@@ -58,8 +57,8 @@ class RecorderImpl : Recorder {
         }
         audioRecord.startRecording()
         while (recording) {
-            val audioBuffer = ShortArray(bufferSize)
-            audioRecord.read(audioBuffer, 0, bufferSize)
+            val audioBuffer = FloatArray(bufferSize)
+            audioRecord.read(audioBuffer, 0, bufferSize, AudioRecord.READ_BLOCKING)
             audioDataReceivedListener?.onAudioDataReceived(audioBuffer)
         }
         audioRecord.stop()

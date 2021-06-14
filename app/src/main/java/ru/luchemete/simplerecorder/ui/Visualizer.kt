@@ -8,7 +8,6 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import ru.luchemete.simplerecorder.R
-import ru.luchemete.simplerecorder.audio.PlaybackTimer
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -35,11 +34,10 @@ open class Visualizer : View {
         init()
     }
 
-    private var ampNormalizer: (Int) -> Int = { sqrt(it.toFloat()).toInt() }
-    private var calculateAmplitudeMax: (ShortArray) -> Int = { it.maxOrNull()?.toInt() ?: 0 }
+    private var ampNormalizer: (Float) -> Float = { sqrt(it) }
+    private var calculateAmplitudeMax: (FloatArray) -> Float = { it.maxOrNull() ?: 0f }
 
-    private var amps = mutableListOf<Int>()
-    private var maxAmp = 250f
+    private var amps = mutableListOf<Float>()
 
     private var cursorPosition = 0
 
@@ -58,7 +56,7 @@ open class Visualizer : View {
     private fun getBaseLine() = height / 2
     private fun getStartBar() = max(0, cursorPosition - maxVisibleBars)
     private fun getEndBar() = min(amps.size, getStartBar() + maxVisibleBars)
-    private fun getBarHeightAt(i: Int) = height * amps[i] / maxAmp
+    private fun getBarHeightAt(i: Int) = height * amps[i] / 1.5
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
@@ -72,8 +70,8 @@ open class Visualizer : View {
 
     override fun onDetachedFromWindow() {
         amps.clear()
-        ampNormalizer = { 0 }
-        calculateAmplitudeMax = { 0 }
+        ampNormalizer = { 0f }
+        calculateAmplitudeMax = { 0f }
         super.onDetachedFromWindow()
     }
 
@@ -165,7 +163,7 @@ open class Visualizer : View {
         }
     }
 
-    fun addAmp(data: ShortArray, position: Int, isRecording: Boolean) {
+    fun addAmp(data: FloatArray, position: Int, isRecording: Boolean) {
         val amp = calculateAmplitudeMax(data)
 
         try {

@@ -17,7 +17,7 @@ class RecorderViewModel(
         IDLE,
     }
 
-    private val audioData = LinkedList<ShortArray>()
+    private val audioData = LinkedList<FloatArray>()
 
     private var cursorPosition = 0
     private var recordingAt = 0
@@ -57,7 +57,7 @@ class RecorderViewModel(
         })
 
         recorder.setAudioDataReceivedListener(object : AudioDataReceivedListener {
-            override fun onAudioDataReceived(data: ShortArray) {
+            override fun onAudioDataReceived(data: FloatArray) {
                 try {
                     audioData.removeAt(recordingAt)
                 } catch (e: Exception) {

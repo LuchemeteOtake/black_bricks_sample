@@ -6,7 +6,7 @@ interface Player {
 
     fun setSettings(settings: PlayBackSettings)
 
-    fun setAudioData(audioData: LinkedList<ShortArray>)
+    fun setAudioData(audioData: LinkedList<FloatArray>)
 
     fun setPlayBackListener(listener: PlaybackListener)
 
