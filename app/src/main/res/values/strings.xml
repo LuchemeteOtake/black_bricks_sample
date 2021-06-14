@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Simple Recorder</string>
+    <string name="settings_title">Settings</string>
+    <string name="low_pass_filter">Low-Pass Filter</string>
+    <string name="gain">Gain</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>

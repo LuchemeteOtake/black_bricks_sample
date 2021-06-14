@@ -52,6 +52,7 @@ class RecorderViewModel(
                 positionLiveData.postValue(cursorPosition)
                 timerLiveData.postValue(PlaybackTimer(getLength(), getPassedTime(cursorPosition)))
                 player.setCursorPosition(cursorPosition)
+                updateState(State.IDLE)
             }
         })
 
@@ -127,6 +128,10 @@ class RecorderViewModel(
         player.setLooped(looped)
         isLooped = looped
         updateState(state)
+    }
+
+    fun setSettings(settings: PlayBackSettings) {
+        player.setSettings(settings)
     }
 
     fun isLoopEnabled() = isLooped

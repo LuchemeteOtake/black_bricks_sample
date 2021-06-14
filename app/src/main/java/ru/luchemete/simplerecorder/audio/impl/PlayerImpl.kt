@@ -1,10 +1,14 @@
 package ru.luchemete.simplerecorder.audio.impl
 
 import android.media.*
+import android.util.Log
 import ru.luchemete.simplerecorder.MainApp
+import ru.luchemete.simplerecorder.audio.PlayBackSettings
 import ru.luchemete.simplerecorder.audio.PlaybackListener
 import ru.luchemete.simplerecorder.audio.Player
+import uk.me.berndporr.iirj.Butterworth
 import java.util.*
+import kotlin.math.pow
 
 
 class PlayerImpl : Player {
@@ -15,9 +19,14 @@ class PlayerImpl : Player {
     private var playbackListener: PlaybackListener? = null
 
     private var audioData = LinkedList<ShortArray>()
+    private lateinit var processedAudioData: List<ShortArray>
+
     private var cursorPosition = 0
 
     private var looped = false
+
+    private var settings = PlayBackSettings()
+    var butterworth = Butterworth()
 
     private var audioAttributes = AudioAttributes.Builder()
         .setUsage(AudioAttributes.USAGE_MEDIA)
@@ -34,8 +43,45 @@ class PlayerImpl : Player {
         AudioFormat.ENCODING_PCM_16BIT
     )
 
+    override fun setSettings(settings: PlayBackSettings) {
+        this.settings = settings
+    }
+
     override fun setAudioData(audioData: LinkedList<ShortArray>) {
         this.audioData = audioData
+    }
+
+    private fun processAudioData() {
+        processedAudioData = audioData
+
+        if (!settings.lpfEnabled && !settings.gainEnabled) {
+            return
+        }
+
+        gainProcessor()
+        lpfProcessor()
+    }
+
+    private fun gainProcessor() {
+        if (!settings.gainEnabled) return
+
+        val scale = 10f.pow(settings.gainLevel / 20f)
+
+        processedAudioData = processedAudioData.map {
+            it.map { value -> (value * scale).toInt().toShort() }.toShortArray()
+        }
+    }
+
+    private fun lpfProcessor() {
+        if (!settings.lpfEnabled) return
+
+        val freq = settings.lpfValue
+        butterworth.lowPass(0, MainApp.SAMPLE_RATE.toDouble(), freq.toDouble())
+
+        processedAudioData = processedAudioData.map {
+            it.map { value -> butterworth.filter(value.toDouble()).toInt().toShort() }
+                .toShortArray()
+        }
     }
 
     override fun setPlayBackListener(listener: PlaybackListener) {
@@ -55,6 +101,7 @@ class PlayerImpl : Player {
 
         if (audioData.isEmpty()) return
 
+        processAudioData()
         playing = true
         playerThread = Thread { startPlayback() }
         playerThread!!.start()
@@ -65,13 +112,13 @@ class PlayerImpl : Player {
     }
 
     private fun rewindIfNeeded() {
-        if (looped && cursorPosition >= audioData.size) {
+        if (looped && cursorPosition >= processedAudioData.size) {
             cursorPosition = 0
         }
     }
 
     private fun shouldPlay(): Boolean {
-        return (looped || cursorPosition < audioData.size) && playing
+        return (looped || cursorPosition < processedAudioData.size) && playing
     }
 
     private fun startPlayback() {
@@ -99,7 +146,7 @@ class PlayerImpl : Player {
         audioTrack.play()
 
         while (shouldPlay()) {
-            val data = audioData[cursorPosition]
+            val data = processedAudioData[cursorPosition]
             val numSamplesLeft: Int = data.size
 
             val samplesToWrite: Int = if (numSamplesLeft >= bufferSize) {
@@ -113,7 +160,7 @@ class PlayerImpl : Player {
             rewindIfNeeded()
         }
 
-        if (cursorPosition >= audioData.size) {
+        if (cursorPosition >= processedAudioData.size) {
             playbackListener?.onCompletion()
         }
 

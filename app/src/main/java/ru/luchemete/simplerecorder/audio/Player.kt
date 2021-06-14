@@ -4,6 +4,8 @@ import java.util.*
 
 interface Player {
 
+    fun setSettings(settings: PlayBackSettings)
+
     fun setAudioData(audioData: LinkedList<ShortArray>)
 
     fun setPlayBackListener(listener: PlaybackListener)

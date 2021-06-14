@@ -3,15 +3,21 @@ package ru.luchemete.simplerecorder.ui
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.widget.CheckBox
 import androidx.activity.result.contract.ActivityResultContracts.RequestPermission
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.google.android.material.slider.RangeSlider
+import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import ru.luchemete.simplerecorder.R
+import ru.luchemete.simplerecorder.audio.PlayBackSettings
 import ru.luchemete.simplerecorder.databinding.RecorderActivityBinding
 import ru.luchemete.simplerecorder.ui.RecorderViewModel.State
-import java.util.*
 
 class RecorderActivity : AppCompatActivity() {
 
@@ -26,40 +32,62 @@ class RecorderActivity : AppCompatActivity() {
             }
         }
 
+    private lateinit var settingsDialog: AlertDialog
+
+    private lateinit var lpf: CheckBox
+    private lateinit var lpfValue: Slider
+
+    private lateinit var gain: CheckBox
+    private lateinit var gainLevel: Slider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = RecorderActivityBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
+        initSettingsDialog()
         initControls()
         initViewModel()
     }
 
-    private fun startAudioRecordingSafe() {
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                viewModel.startRecording()
+    private fun initSettingsDialog() {
+        settingsDialog = AlertDialog.Builder(this).apply {
+            setTitle(R.string.settings_title)
+            setView(getSettingsView())
+            setPositiveButton(
+                R.string.ok
+            ) { _, _ ->
+                getSettings()
             }
-            shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) -> {
-                Snackbar.make(
-                    binding.visualizer, "Microphone access is required in order to record audio",
-                    Snackbar.LENGTH_INDEFINITE
-                ).setAction("OK") {
-                    requestPermissionLauncher.launch(
-                        Manifest.permission.RECORD_AUDIO
-                    )
-                }.show()
+            setNegativeButton(
+                R.string.cancel
+            ) { _, _ ->
             }
-            else -> {
-                requestPermissionLauncher.launch(
-                    Manifest.permission.RECORD_AUDIO
-                )
-            }
+        }.create()
+    }
+
+    private fun getSettingsView(): View {
+        val view = View.inflate(this@RecorderActivity, R.layout.settings_dialog, null)
+        view.apply {
+            lpf = findViewById(R.id.lpf)
+            lpfValue = findViewById(R.id.lpf_value)
+
+            gain = findViewById(R.id.gain)
+            gainLevel = findViewById(R.id.gain_level)
         }
+        return view
+    }
+
+    private fun getSettings() {
+        val lpfEnabled = lpf.isChecked
+        val lpfValue = lpfValue.value
+
+        val gainEnabled = gain.isChecked
+        val gainLevel = gainLevel.value
+
+        val settings = PlayBackSettings(lpfEnabled, lpfValue, gainEnabled, gainLevel)
+        viewModel.setSettings(settings)
     }
 
     private fun initViewModel() {
@@ -77,10 +105,10 @@ class RecorderActivity : AppCompatActivity() {
 
         viewModel.timerLiveData.observe(this) {
             val length = it.length
-            val lengthString = String.format("%02d:%02d", length/60, length%60)
+            val lengthString = String.format("%02d:%02d", length / 60, length % 60)
 
             val passed = it.passed
-            val passedString = String.format("%02d:%02d", passed/60, passed%60)
+            val passedString = String.format("%02d:%02d", passed / 60, passed % 60)
 
             binding.playbackTimer.text = "$passedString/$lengthString"
         }
@@ -120,6 +148,10 @@ class RecorderActivity : AppCompatActivity() {
 
         binding.loopButtonContainer.loopActive.setOnClickListener {
             viewModel.setLooped(false)
+        }
+
+        binding.settings.setOnClickListener {
+            showSettings()
         }
     }
 
@@ -166,6 +198,36 @@ class RecorderActivity : AppCompatActivity() {
                 binding.playButtonContainer.playDisabled.visibility = View.VISIBLE
                 binding.recordButtonContainer.stopRecord.visibility = View.VISIBLE
                 binding.loopButtonContainer.loopDisabled.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private fun showSettings() {
+        settingsDialog.show()
+    }
+
+    private fun startAudioRecordingSafe() {
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                viewModel.startRecording()
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.RECORD_AUDIO) -> {
+                Snackbar.make(
+                    binding.visualizer, "Microphone access is required in order to record audio",
+                    Snackbar.LENGTH_INDEFINITE
+                ).setAction("OK") {
+                    requestPermissionLauncher.launch(
+                        Manifest.permission.RECORD_AUDIO
+                    )
+                }.show()
+            }
+            else -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.RECORD_AUDIO
+                )
             }
         }
     }

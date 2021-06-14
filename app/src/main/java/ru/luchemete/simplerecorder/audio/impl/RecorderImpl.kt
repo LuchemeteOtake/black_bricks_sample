@@ -4,6 +4,7 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Process
+import android.util.Log
 import ru.luchemete.simplerecorder.MainApp
 import ru.luchemete.simplerecorder.audio.AudioDataReceivedListener
 import ru.luchemete.simplerecorder.audio.Recorder

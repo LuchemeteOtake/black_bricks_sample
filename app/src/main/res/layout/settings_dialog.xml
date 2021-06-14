@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="@dimen/dp_300"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/dp_16">
+
+    <CheckBox
+        android:id="@+id/lpf"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layoutDirection="rtl"
+        android:text="@string/low_pass_filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/lpf_value"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:valueFrom="1000.0"
+        android:valueTo="20000.0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lpf" />
+
+    <CheckBox
+        android:id="@+id/gain"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layoutDirection="rtl"
+        android:text="@string/gain"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/lpf_value" />
+
+    <com.google.android.material.slider.Slider
+        android:id="@+id/gain_level"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:valueFrom="0.0"
+        android:valueTo="3.0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/gain" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
