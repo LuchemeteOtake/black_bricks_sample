@@ -56,7 +56,7 @@ open class Visualizer : View {
     private fun getBaseLine() = height / 2
     private fun getStartBar() = max(0, cursorPosition - maxVisibleBars)
     private fun getEndBar() = min(amps.size, getStartBar() + maxVisibleBars)
-    private fun getBarHeightAt(i: Int) = height * amps[i] / 1.5
+    private fun getBarHeightAt(i: Int) = height * amps[i]
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
