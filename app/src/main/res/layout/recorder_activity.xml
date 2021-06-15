@@ -83,9 +83,9 @@
             app:layout_constraintStart_toEndOf="@id/loop_button_container">
 
             <ImageView
-                android:layout_margin="@dimen/dp_8"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_margin="@dimen/dp_8"
                 android:src="@drawable/ic_settings" />
         </FrameLayout>
 

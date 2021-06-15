@@ -24,6 +24,9 @@ open class Visualizer : View {
         attrs: AttributeSet?,
     ) : super(context, attrs) {
         init()
+        attrs?.let {
+            initAttrs(attrs)
+        }
     }
 
     constructor(
@@ -32,6 +35,9 @@ open class Visualizer : View {
         defStyleAttr: Int,
     ) : super(context, attrs, defStyleAttr) {
         init()
+        attrs?.let {
+            initAttrs(attrs)
+        }
     }
 
     private var ampNormalizer: (Float) -> Float = { sqrt(it) }
@@ -47,10 +53,27 @@ open class Visualizer : View {
     private lateinit var cursorPaint: Paint
     private lateinit var baselinePaint: Paint
 
+    private var normalized = false
+
     private fun init() {
         ampPaint = Paint().apply { color = context.getColor(R.color.gray_amp) }
         cursorPaint = Paint().apply { color = context.getColor(R.color.white) }
         baselinePaint = Paint().apply { color = context.getColor(R.color.teal_200) }
+    }
+
+    private fun initAttrs(attrs: AttributeSet){
+        context.theme.obtainStyledAttributes(
+            attrs,
+            R.styleable.Visualizer,
+            0, 0
+        ).apply {
+
+            try {
+                normalized = getBoolean(R.styleable.Visualizer_normalized, false)
+            } finally {
+                recycle()
+            }
+        }
     }
 
     private fun getBaseLine() = height / 2
@@ -170,7 +193,12 @@ open class Visualizer : View {
             this.amps.removeAt(position)
         } catch (e: Exception) {
         }
-        this.amps.add(position, ampNormalizer.invoke(amp))
+
+        if(normalized) {
+            this.amps.add(position, ampNormalizer.invoke(amp))
+        } else {
+            this.amps.add(position, amp)
+        }
 
         if (isRecording) setCursorPosition(position)
     }
