@@ -122,6 +122,7 @@ class RecorderViewModel(
     fun setCursorPosition(position: Int) {
         player.setCursorPosition(position)
         cursorPosition = position
+        timerLiveData.postValue(PlaybackTimer(getLength(), getPassedTime(cursorPosition)))
     }
 
     fun setLooped(looped: Boolean) {
